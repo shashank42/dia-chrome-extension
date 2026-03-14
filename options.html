@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dia — Settings</title>
+  <link rel="stylesheet" href="options.css">
+</head>
+<body>
+  <div class="container">
+    <h1>Dia Settings</h1>
+    <p class="subtitle">Configure your LLM provider and preferences.</p>
+
+    <form id="settings-form">
+      <div class="field">
+        <label for="provider">Provider</label>
+        <select id="provider">
+          <option value="openai">OpenAI</option>
+          <option value="gemini">Google Gemini</option>
+          <option value="ollama">Ollama (Local)</option>
+          <option value="custom">Custom (OpenAI-compatible)</option>
+        </select>
+      </div>
+
+      <div class="field" id="apikey-field">
+        <label for="apiKey">API Key</label>
+        <input type="password" id="apiKey" placeholder="sk-…" autocomplete="off">
+      </div>
+
+      <div class="field">
+        <label for="baseUrl">API Base URL</label>
+        <input type="text" id="baseUrl" placeholder="https://api.openai.com">
+      </div>
+
+      <div class="field">
+        <label for="model">Model</label>
+        <input type="text" id="model" placeholder="gpt-4o-mini">
+      </div>
+
+      <div class="field">
+        <label for="systemPrompt">System Prompt</label>
+        <textarea id="systemPrompt" rows="4" placeholder="You are a helpful assistant…"></textarea>
+      </div>
+
+      <div class="actions">
+        <button type="submit" class="btn-primary">Save Settings</button>
+        <span id="status" class="status"></span>
+      </div>
+    </form>
+  </div>
+
+  <script src="options.js"></script>
+</body>
+</html>
