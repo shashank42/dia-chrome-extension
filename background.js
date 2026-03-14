@@ -1,5 +1,9 @@
 chrome.sidePanel.setPanelBehavior({ openPanelOnActionClick: true });
 
+function relay(message) {
+  chrome.runtime.sendMessage(message).catch(() => {});
+}
+
 chrome.runtime.onInstalled.addListener(() => {
   chrome.contextMenus.create({
     id: "ask-dia",
@@ -12,11 +16,12 @@ chrome.contextMenus.onClicked.addListener((info, tab) => {
   if (info.menuItemId === "ask-dia") {
     chrome.sidePanel.open({ tabId: tab.id }).then(() => {
       setTimeout(() => {
-        chrome.runtime.sendMessage({
+        relay({
           type: "TEXT_SELECTED",
           text: info.selectionText,
           pageUrl: tab.url,
-          pageTitle: tab.title
+          pageTitle: tab.title,
+          relayed: true
         });
       }, 300);
     });
@@ -30,7 +35,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     message.pageUrl = sender.tab.url;
     message.pageTitle = sender.tab.title;
     chrome.sidePanel.open({ tabId: sender.tab.id }).then(() => {
-      chrome.runtime.sendMessage({ ...message, relayed: true });
+      relay({ ...message, relayed: true });
     });
     return;
   }
@@ -41,6 +46,6 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     message.type === "INPUT_SUBMIT" ||
     message.type === "CAPTURE_END"
   ) {
-    chrome.runtime.sendMessage({ ...message, relayed: true });
+    relay({ ...message, relayed: true });
   }
 });

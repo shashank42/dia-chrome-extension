@@ -26,15 +26,90 @@ async function getSettings() {
   });
 }
 
-// --- Markdown rendering ---
+// --- Markdown + LaTeX rendering ---
 
 if (typeof marked !== "undefined") {
   marked.setOptions({ breaks: true, gfm: true });
 }
 
+function renderLatex(html) {
+  if (typeof katex === "undefined") return html;
+
+  // Display math: $$...$$ (must come first)
+  html = html.replace(/\$\$([\s\S]+?)\$\$/g, (_, tex) => {
+    try {
+      return katex.renderToString(tex.trim(), { displayMode: true, throwOnError: false });
+    } catch (_) { return `$$${tex}$$`; }
+  });
+
+  // Display math: \[...\]
+  html = html.replace(/\\\[([\s\S]+?)\\\]/g, (_, tex) => {
+    try {
+      return katex.renderToString(tex.trim(), { displayMode: true, throwOnError: false });
+    } catch (_) { return `\\[${tex}\\]`; }
+  });
+
+  // Inline math: $...$ (not preceded/followed by $)
+  html = html.replace(/(?<!\$)\$(?!\$)(.+?)(?<!\$)\$(?!\$)/g, (_, tex) => {
+    try {
+      return katex.renderToString(tex.trim(), { displayMode: false, throwOnError: false });
+    } catch (_) { return `$${tex}$`; }
+  });
+
+  // Inline math: \(...\)
+  html = html.replace(/\\\((.+?)\\\)/g, (_, tex) => {
+    try {
+      return katex.renderToString(tex.trim(), { displayMode: false, throwOnError: false });
+    } catch (_) { return `\\(${tex}\\)`; }
+  });
+
+  return html;
+}
+
+const LATEX_INDICATORS = /\\(?:begin|end|frac|sqrt|sum|prod|int|lim|left|right|text|math|alpha|beta|gamma|delta|epsilon|theta|lambda|sigma|omega|infty|partial|nabla|cdot|times|div|pm|mp|leq|geq|neq|approx|equiv|leftarrow|rightarrow|Leftarrow|Rightarrow|hat|bar|vec|dot|ddot|tilde)\b/;
+
+function isLatexCodeBlock(code) {
+  return LATEX_INDICATORS.test(code);
+}
+
 function renderMarkdown(text) {
   if (typeof marked !== "undefined") {
-    return marked.parse(text);
+    // Convert fenced code blocks that contain LaTeX into $$...$$ blocks
+    text = text.replace(/```(?:latex|tex|math)?\s*\n([\s\S]*?)```/g, (match, code) => {
+      if (isLatexCodeBlock(code)) {
+        return `$$\n${code.trim()}\n$$`;
+      }
+      return match;
+    });
+
+    // Protect real code blocks (non-LaTeX)
+    const codeBlocks = [];
+    let protected_ = text.replace(/```[\s\S]*?```|`[^`]+`/g, (match) => {
+      codeBlocks.push(match);
+      return `%%CODEBLOCK_${codeBlocks.length - 1}%%`;
+    });
+
+    // Protect LaTeX expressions from marked's escaping
+    const latexBlocks = [];
+    protected_ = protected_.replace(/\$\$[\s\S]+?\$\$|\\\[[\s\S]+?\\\]|\\\(.+?\\\)|(?<!\$)\$(?!\$).+?(?<!\$)\$(?!\$)/g, (match) => {
+      latexBlocks.push(match);
+      return `%%LATEX_${latexBlocks.length - 1}%%`;
+    });
+
+    // Restore code blocks before marked processes them
+    let restored = protected_;
+    codeBlocks.forEach((block, i) => {
+      restored = restored.replace(`%%CODEBLOCK_${i}%%`, block);
+    });
+
+    let html = marked.parse(restored);
+
+    // Restore and render LaTeX
+    latexBlocks.forEach((block, i) => {
+      html = html.replace(`%%LATEX_${i}%%`, () => renderLatex(block));
+    });
+
+    return html;
   }
   return text.replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/\n/g, "<br>");
 }

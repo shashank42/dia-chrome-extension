@@ -158,6 +158,17 @@ main {
   margin: 6px 0;
 }
 
+.message .katex-display {
+  margin: 10px 0;
+  overflow-x: auto;
+  overflow-y: hidden;
+  padding: 4px 0;
+}
+
+.message .katex {
+  font-size: 1em;
+}
+
 .message .quote {
   background: var(--quote-bg);
   border-left: 3px solid var(--quote-border);
