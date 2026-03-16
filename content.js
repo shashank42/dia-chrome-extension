@@ -19,6 +19,17 @@ function getXPath(node) {
   return "/" + parts.join("/");
 }
 
+function isInsideInput(node) {
+  if (!node) return false;
+  if (node.nodeType === Node.TEXT_NODE) node = node.parentNode;
+  for (let el = node; el && el !== document.body; el = el.parentElement) {
+    const tag = el.nodeName && el.nodeName.toLowerCase();
+    if (tag === "input" || tag === "textarea") return true;
+    if (el.isContentEditable) return true;
+  }
+  return false;
+}
+
 let debounceTimer = null;
 let captureMode = false;
 
@@ -28,6 +39,8 @@ document.addEventListener("mouseup", () => {
     const selection = window.getSelection();
     const text = selection.toString().trim();
     if (text.length < 2) return;
+
+    const inInput = isInsideInput(selection.anchorNode) || isInsideInput(selection.focusNode);
 
     let xpath = "";
     try {
@@ -40,7 +53,7 @@ document.addEventListener("mouseup", () => {
       xpath
     });
 
-    captureMode = true;
+    if (!inInput) captureMode = true;
   }, 150);
 });
 
