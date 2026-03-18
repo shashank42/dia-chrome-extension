@@ -1,8 +1,8 @@
 {
   "manifest_version": 3,
   "name": "Dia",
-  "version": "1.0.0",
-  "description": "Highlight text on any page and chat with an LLM about it in a persistent side panel.",
+  "version": "1.0.2",
+  "description": "Select & directly start typing — no extra clicks. Ultra-smooth UX vs AI Browsers (e.g. Dia Browser). LLM side panel; your API key.",
   "permissions": [
     "activeTab",
     "sidePanel",
