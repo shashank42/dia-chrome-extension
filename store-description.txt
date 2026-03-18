@@ -1,0 +1,10 @@
+Select & directly start typing — no extra clicks. That’s the core of Dia: highlight any text on a page and your next keystrokes go straight into the chat. No hunting for the input, no extra click. Ultra-smooth UX compared to built-in browser AI (e.g. Dia Browser), where you often have to click into the chat box after selecting.
+
+Dia is a reading assistant that lives in your browser’s side panel. Use your own LLM API key (Gemini, OpenAI, Ollama, or any OpenAI-compatible API). Highlight text on any webpage — it appears in Dia instantly. Type your question and get streaming answers, with Markdown and LaTeX rendering. Right-click “Ask Dia about” on a selection or keep the side panel open and select-and-type on any site, including Kindle Cloud Reader and iframe-based pages.
+
+Features:
+• Select text → type immediately (no extra click)
+• Persistent side panel chat
+• Streaming responses with Markdown and LaTeX
+• Your API key — Gemini, OpenAI, Ollama, or custom endpoint
+• Works in inputs too — won’t steal focus when you’re editing in a search box or form
